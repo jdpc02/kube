@@ -6,17 +6,17 @@ kubes = [
         :name => "kube-master",
         :role => "master",
         :itsip => "192.168.71.51"
-    }#,
-    #{
-    #    :name => "kube-node1",
-    #    :role => "compute",
-    #    :itsip => "192.168.71.61"
-    #},
-    #{
-    #    :name => "kube-node2",
-    #    :role => "compute",
-    #    :itsip => "192.168.71.62"
-    #}
+    },
+    {
+        :name => "kube-node1",
+        :role => "compute",
+        :itsip => "192.168.71.61"
+    },
+    {
+        :name => "kube-node2",
+        :role => "compute",
+        :itsip => "192.168.71.62"
+    }
 ]
 
 # Installing on all node types
@@ -50,6 +50,7 @@ EOF
   sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
   echo 'Updating the nodes'
+  sudo yum upgrade -y
   sudo yum update -y
 
   echo 'Installing the necessary kubernetes packages'
@@ -83,20 +84,67 @@ EOF
   mkdir -p /etc/systemd/system/docker.service.d
   sudo systemctl daemon-reload
   sudo systemctl restart docker
+  sudo systemctl enable docker.service
   echo 'Completed Docker Setup'
 
   echo 'Finishing up'
   sudo sysctl --system
   sudo systemctl enable --now kubelet
+  sudo systemctl start kubelet
+  usermod -aG docker vagrant
+  IPADDR=`ip addr sh eth1 | grep -E 'inet ' | awk '{print $2}' | cut -f1 -d/`
+  echo This VM has IP address $IPADDR
+  echo $IPADDR > /home/vagrant/IPADDR.txt
+
   echo 'Finished common config'
 SCRIPT
 
 # Installing on all master nodes
 $cfgmaster = <<-SCRIPT
+  echo 'Starting master setup'
+
+  echo 'Verify connectivity to gcr.io registries'
+  kubeadm config images pull
+
+  echo 'Initializing kubernetes'
+  MASTERNODE=$(hostname -s)
+  echo 'Initializing master node'
+  sudo kubeadm init --pod-network-cidr=192.168.71.0/24 \
+  --apiserver-advertise-address $(cat /home/vagrant/IPADDR.txt) \
+  --apiserver-cert-extra-sans=$(cat /home/vagrant/IPADDR.txt) \
+  --node-name $MASTERNODE
+
+  echo 'Create script to auto-join compute nodes'
+  kubeadm token create --print-join-command >> /home/vagrant/kubeadm_join_cmd.sh
+  chmod +x /home/vagrant/kubeadm_join_cmd.sh
+
+  echo 'Finishing up'
+  sudo sed -i "/^[^#]*PasswordAuthentication[[:space:]]no/c\PasswordAuthentication yes" /etc/ssh/sshd_config
+  sudo service sshd restart
+
+  echo 'Setup vagrant for kubernetes access'
+  sudo su - vagrant
+  mkdir -p .kube
+  sudo cp /etc/kubernetes/admin.conf .kube/config
+  sudo chown $(id -u):$(id -g) .kube/config
+
+  echo "Install Weave Net Pod Network Add-On"
+  sudo sysctl net.bridge.bridge-nf-call-iptables=1
+  export verkube=$(kubectl version | base64 | tr -d '\n')
+  kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$verkube"
+
+  echo 'Finished master setup'
 SCRIPT
 
 # Installing on all compute nodes
 $cfgcompute = <<-SCRIPT
+  echo 'Starting setting up compute node'
+
+  sudo yum install -y sshpass
+  sshpass -p "vagrant" scp -o StrictHostKeyChecking=no vagrant@192.168.71.51:/home/vagrant/kubeadm_join_cmd.sh .
+  sh ./kubeadm_join_cmd
+
+  echo 'Finished setting up compute node'
 SCRIPT
 
 
