@@ -112,10 +112,10 @@ $cfgmaster = <<-SCRIPT
   sudo kubeadm init --pod-network-cidr=192.168.71.0/24 \
   --apiserver-advertise-address $(cat /home/vagrant/IPADDR.txt) \
   --apiserver-cert-extra-sans=$(cat /home/vagrant/IPADDR.txt) \
-  --node-name $MASTERNODE
+  --node-name $MASTERNODE | tee /home/vagrant/kubeinit.log
 
   echo 'Create script to auto-join compute nodes'
-  kubeadm token create --print-join-command >> /home/vagrant/kubeadm_join_cmd.sh
+  cat /home/vagrant/kubeinit.log | grep -E 'kubeadm join' > /home/vagrant/kubeadm_join_cmd.sh
   chmod +x /home/vagrant/kubeadm_join_cmd.sh
 
   echo 'Finishing up'
@@ -124,14 +124,18 @@ $cfgmaster = <<-SCRIPT
 
   echo 'Setup vagrant for kubernetes access'
   sudo su - vagrant
-  mkdir -p .kube
-  sudo cp /etc/kubernetes/admin.conf .kube/config
-  sudo chown $(id -u):$(id -g) .kube/config
+  mkdir -p $HOME/.kube
+  sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u vagrant):$(id -g vagrant) $HOME/.kube/config
 
   echo "Install Weave Net Pod Network Add-On"
   sudo sysctl net.bridge.bridge-nf-call-iptables=1
   export verkube=$(kubectl version | base64 | tr -d '\n')
   kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$verkube"
+
+  mkdir -p /home/vagrant/.kube
+  sudo cp -f /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+  sudo chown $(id -u vagrant):$(id -g vagrant) /home/vagrant/.kube/config
 
   echo 'Finished master setup'
 SCRIPT
@@ -141,8 +145,8 @@ $cfgcompute = <<-SCRIPT
   echo 'Starting setting up compute node'
 
   sudo yum install -y sshpass
-  sshpass -p "vagrant" scp -o StrictHostKeyChecking=no vagrant@192.168.71.51:/home/vagrant/kubeadm_join_cmd.sh .
-  sh ./kubeadm_join_cmd
+  sshpass -p "vagrant" scp -o StrictHostKeyChecking=no vagrant@192.168.71.51:/home/vagrant/kubeadm_join_cmd.sh /home/vagrant/.
+  sudo sh /home/vagrant/kubeadm_join_cmd.sh
 
   echo 'Finished setting up compute node'
 SCRIPT
