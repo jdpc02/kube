@@ -96,7 +96,11 @@ EOF
   echo This VM has IP address $IPADDR
   echo $IPADDR > /home/vagrant/IPADDR.txt
 
-  sudo sed -i "/^[^#]*KUBELET_EXTRA_ARGS=/c\KUBELET_EXTRA_ARGS=--node-ip=$IP_ADDR" /etc/default/kubelet
+  sudo chmod 646 /etc/sysconfig/kubelet
+  # sudo cat "KUBELET_EXTRA_ARGS=--node-ip=$(cat /home/vagrant/IPADDR.txt)" > /etc/default/kubelet
+  sudo echo "KUBELET_EXTRA_ARGS=--node-ip=$(cat /home/vagrant/IPADDR.txt)" > /etc/sysconfig/kubelet
+  sudo chmod 644 /etc/sysconfig/kubelet
+  sudo systemctl daemon-reload
   sudo systemctl restart kubelet
 
   echo 'Finished common config'
@@ -153,7 +157,6 @@ $cfgcompute = <<-SCRIPT
 
   echo 'Finished setting up compute node'
 SCRIPT
-
 
 Vagrant.configure(2) do |config|
   config.vm.box = "centos/7"
