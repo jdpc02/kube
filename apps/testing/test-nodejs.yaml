@@ -1,0 +1,13 @@
+ apiVersion: v1
+ kind: Pod
+ metadata:
+   name: mynodejs
+   labels:
+     app: mynodejs
+ spec:
+   containers:
+   - name: mynodejs
+     image: jdpc/mynodejs
+     imagePullPolicy: Always
+     ports:
+     - containerPort: 3000

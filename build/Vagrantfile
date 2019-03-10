@@ -53,9 +53,6 @@ EOF
   sudo yum upgrade -y
   sudo yum update -y
 
-  echo 'Installing the necessary kubernetes packages'
-  sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
-
   echo 'Starting Docker Setup'
   sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 
@@ -64,7 +61,7 @@ EOF
     --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
   echo 'Install DockerCE'
-  sudo yum install -y docker-ce-18.06.2.ce
+  sudo yum install -y docker-ce docker-ce-cli containerd.io
 
   echo 'Setup docker daemon'
   sudo mkdir /etc/docker
@@ -85,16 +82,22 @@ EOF
   sudo systemctl daemon-reload
   sudo systemctl restart docker
   sudo systemctl enable docker.service
+  usermod -aG docker vagrant
   echo 'Completed Docker Setup'
+
+  echo 'Installing the necessary kubernetes packages'
+  sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 
   echo 'Finishing up'
   sudo sysctl --system
   sudo systemctl enable --now kubelet
   sudo systemctl start kubelet
-  usermod -aG docker vagrant
   IPADDR=`ip addr sh eth1 | grep -E 'inet ' | awk '{print $2}' | cut -f1 -d/`
   echo This VM has IP address $IPADDR
   echo $IPADDR > /home/vagrant/IPADDR.txt
+
+  sudo sed -i "/^[^#]*KUBELET_EXTRA_ARGS=/c\KUBELET_EXTRA_ARGS=--node-ip=$IP_ADDR" /etc/default/kubelet
+  sudo systemctl restart kubelet
 
   echo 'Finished common config'
 SCRIPT
@@ -109,7 +112,7 @@ $cfgmaster = <<-SCRIPT
   echo 'Initializing kubernetes'
   MASTERNODE=$(hostname -s)
   echo 'Initializing master node'
-  sudo kubeadm init --pod-network-cidr=192.168.71.0/24 \
+  sudo kubeadm init --pod-network-cidr=192.168.0.0/16 \
   --apiserver-advertise-address $(cat /home/vagrant/IPADDR.txt) \
   --apiserver-cert-extra-sans=$(cat /home/vagrant/IPADDR.txt) \
   --node-name $MASTERNODE | tee /home/vagrant/kubeinit.log
@@ -128,10 +131,10 @@ $cfgmaster = <<-SCRIPT
   sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
   sudo chown $(id -u vagrant):$(id -g vagrant) $HOME/.kube/config
 
-  echo "Install Weave Net Pod Network Add-On"
-  sudo sysctl net.bridge.bridge-nf-call-iptables=1
-  export verkube=$(kubectl version | base64 | tr -d '\n')
-  kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$verkube"
+  echo "Install Calico Pod Network Add-On"
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+  kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+  kubectl apply -f https://docs.projectcalico.org/v3.1/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
 
   mkdir -p /home/vagrant/.kube
   sudo cp -f /etc/kubernetes/admin.conf /home/vagrant/.kube/config
