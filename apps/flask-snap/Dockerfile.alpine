@@ -4,6 +4,7 @@ RUN adduser -D sdsnap
 
 WORKDIR /home/sdsnap
 
+RUN apk add libxml2-dev libxslt-dev gcc libc-dev
 COPY requirements.txt requirements.txt
 RUN python -m venv venv
 RUN sudo venv/bin/pip install -r requirements.txt
