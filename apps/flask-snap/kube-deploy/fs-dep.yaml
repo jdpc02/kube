@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-sdsnap
+spec:
+  selector:
+    matchLabels:
+      app: flask-sdsnap
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: flask-sdsnap
+    spec:
+      containers:
+      - name: flask-sdsnap
+        image: jdpc/flask-sdsnap:0.1.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5050
