@@ -8,7 +8,7 @@ My References:
 * [pod does not exist/could not find the requested resource](https://medium.com/@joatmon08/playing-with-kubeadm-in-vagrant-machines-part-2-bac431095706)
 * [Nodeport VS ClusterIP VS LoadBalancer](https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0)
 
-** Docker Shortcuts **
+**Docker Shortcuts**
 
 Delete failed builds:
 ```
@@ -34,7 +34,7 @@ Run your new image:
 $ docker run -d -p <port_on_host>:<port_on_container> --name <somename> --rm <user>/<image>:[version/latest]
 ```
 
-** Other Tips **
+**Other Tips**
 
 Watch out for ^M at the end of a line:
 - vi -f <filename>
