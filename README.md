@@ -21,7 +21,7 @@ Build and push:
 ```
 $ docker login -u <user>
 $ docker build -t <user>/<image>:[version/latest]
-$ docker push
+$ docker push <user>/<image>:[version/latest]
 ```
 
 Test your new image:
