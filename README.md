@@ -35,9 +35,10 @@ $ docker run -d -p <port_on_host>:<port_on_container> --name <somename> --rm <us
 ```
 
 **Other Tips**
-
 Watch out for ^M at the end of a line:
-- vi -f <filename>
-- vim -b <filename>
-- dos2unix <filename>
-- vi :e ++ff=dos, :set ff=unix
+```
+$ vi -f <filename>
+$ vim -b <filename>
+$ dos2unix <filename>
+$ vi :e ++ff=dos, :set ff=unix
+```
