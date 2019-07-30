@@ -116,7 +116,7 @@ $cfgmaster = <<-SCRIPT
   echo 'Initializing kubernetes'
   MASTERNODE=$(hostname -s)
   echo 'Initializing master node'
-  sudo kubeadm init --pod-network-cidr=192.168.0.0/16 \
+  sudo kubeadm init --pod-network-cidr=172.100.0.0/16 \
   --apiserver-advertise-address $(cat /home/vagrant/IPADDR.txt) \
   --apiserver-cert-extra-sans=$(cat /home/vagrant/IPADDR.txt) \
   --node-name $MASTERNODE | tee /home/vagrant/kubeinit.log
