@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: flask-sdsnap
 spec:
-  type: NodePort
+  type: LoadBalancer # NodePort
   selector:
     app: flask-sdsnap
   ports:
