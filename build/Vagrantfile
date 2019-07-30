@@ -122,7 +122,7 @@ $cfgmaster = <<-SCRIPT
   --node-name $MASTERNODE | tee /home/vagrant/kubeinit.log
 
   echo 'Create script to auto-join compute nodes'
-  cat /home/vagrant/kubeinit.log | grep -E 'kubeadm join' > /home/vagrant/kubeadm_join_cmd.sh
+  tail -n 2 /home/vagrant/kubeinit.log > /home/vagrant/kubeadm_join_cmd.sh
   chmod +x /home/vagrant/kubeadm_join_cmd.sh
 
   echo 'Finishing up'
@@ -159,7 +159,7 @@ $cfgcompute = <<-SCRIPT
 SCRIPT
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "centos/7"
+  config.vm.box = "bento/centos-7"
   config.vm.boot_timeout = 300
 
   kubes.each do |dokube|
