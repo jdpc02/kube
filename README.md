@@ -7,6 +7,7 @@ My References:
 * [Kubernetes in Vagrant with kubeadm](https://medium.com/@lizrice/kubernetes-in-vagrant-with-kubeadm-21979ded6c63)
 * [pod does not exist/could not find the requested resource](https://medium.com/@joatmon08/playing-with-kubeadm-in-vagrant-machines-part-2-bac431095706)
 * [Nodeport VS ClusterIP VS LoadBalancer](https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0)
+* [Using MetalLB for local workstation LB](https://metallb.universe.tf/)
 
 **Docker Shortcuts**
 
