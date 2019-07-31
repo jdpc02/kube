@@ -1,24 +1,16 @@
 FROM python:3.7.2-alpine3.9
 
 RUN adduser -D sdsnap
-
 WORKDIR /home/sdsnap
 
-RUN apk add libxml2-dev libxslt-dev gcc libc-dev
-COPY requirements.txt requirements.txt
-RUN python -m venv venv
-RUN sudo venv/bin/pip install -r requirements.txt
-RUN sudo venv/bin/pip install gunicorn
-
-COPY sdsnap sdsnap
-COPY flask-snap.py boot.sh ./
-RUN chmod +x boot.sh
+COPY --chown=sdsnap:sdsnap package .
+RUN apk --no-cache add libxml2-dev libxslt-dev gcc libc-dev && python -m venv venv \
+  && venv/bin/pip install -r requirements.txt && venv/bin/pip install gunicorn \
+  && chmod +x boot.sh
 
 ENV FLASK_APP flask-snap.py
 ENV FLASK_ENV development
 ENV FLASK_RUN_PORT 5050
-
-RUN chown -R sdsnap:sdsnap ./
 USER sdsnap
 
 EXPOSE 5050
