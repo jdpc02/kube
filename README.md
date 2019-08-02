@@ -9,6 +9,12 @@ My References:
 * [Nodeport VS ClusterIP VS LoadBalancer](https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0)
 * [Using MetalLB for local workstation LB](https://metallb.universe.tf/)
 
+MetalLB Specific
+```
+kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/metallb.yaml
+```
+To utilize MetalLB for the config, ensure you deploy the Vagrantfile.PublicNetwork stack.
+
 **Docker Shortcuts**
 
 Delete failed builds:

@@ -9,5 +9,5 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 192.168.0.81-192.168.0.90
+      - 192.168.0.91-192.168.0.95
       avoid-buggy-ips: true
