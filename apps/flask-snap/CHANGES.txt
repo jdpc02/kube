@@ -1,1 +1,5 @@
 0.1.0 - 20190303 - DC - Inital release
+0.2.0 - 20190310 - DC - Used alpine python image to minimize size
+0.3.0 - 20190731 - DC - Updated Dockerfile to futher decrease the size of the image
+0.4.0 - 20190801 - DC - Added check if site is not reachable
+0.5.0 - 20190905 - DC - Update python modules to latest release and use python:3.7.4-alpine3.10
