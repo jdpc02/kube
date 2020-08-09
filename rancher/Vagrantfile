@@ -1,0 +1,56 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+kubes = [
+  {
+      :name => "rancher",
+      :role => "rancher",
+      :itsip => "192.168.0.81"
+  },
+  {
+      :name => "kube",
+      :role => "allinone",
+      :itsip => "192.168.0.84"
+  }
+]
+
+$setupdocker = <<-SCRIPT
+echo Setup docker environment
+sudo yum -y update
+ sudo yum install -y yum-utils \
+  device-mapper-persistent-data \
+  lvm2
+sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install -y docker-ce docker-ce-cli containerd.io
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker vagrant
+echo Completed docker environment setup
+
+SCRIPT
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "bento/centos-7"
+  config.vm.boot_timeout = 300
+
+  kubes.each do |dokube|
+    config.vm.define dokube[:name] do |node|
+      node.vm.hostname = dokube[:name]
+      node.vm.network "public_network", ip: dokube[:itsip], bridge: "Intel(R) Dual Band Wireless-AC 3165"
+      node.vm.provider "virtualbox" do |a|
+        a.name = dokube[:name]
+        if dokube[:role] == "rancher"
+          a.memory = 2048
+          a.cpus = 1
+        else
+          a.memory = 8192
+          a.cpus = 2
+        end
+        a.gui = false
+      end
+      node.vm.provision "shell", inline: $setupdocker
+    end
+  end
+end

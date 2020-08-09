@@ -8,12 +8,20 @@ My References:
 * [pod does not exist/could not find the requested resource](https://medium.com/@joatmon08/playing-with-kubeadm-in-vagrant-machines-part-2-bac431095706)
 * [Nodeport VS ClusterIP VS LoadBalancer](https://medium.com/google-cloud/kubernetes-nodeport-vs-loadbalancer-vs-ingress-when-should-i-use-what-922f010849e0)
 * [Using MetalLB for local workstation LB](https://metallb.universe.tf/)
+* [Rancher QuickStart](https://rancher.com/docs/rancher/v2.x/en/quick-start-guide/deployment/quickstart-manual-setup/)
 
 MetalLB Specific
 ```
 kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/metallb.yaml
 ```
 To utilize MetalLB for the config, ensure you deploy the Vagrantfile.PublicNetwork stack.
+
+**Rancher Notes**
+* Run on the rancher node
+```
+sudo docker run -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher
+```
+* Configure via rancher GUI and add custom cluster. Run docker command on kube node. Wait until cluster state is Active.
 
 **Docker Shortcuts**
 
