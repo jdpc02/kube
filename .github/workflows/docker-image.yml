@@ -1,0 +1,21 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  DeployImage:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout kube
+      uses: actions/checkout@v2
+    - name: Login to dockerhub
+      run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_ACCESS_TOKEN }}
+    - name: Build the Docker image
+      run: docker build . --file apps/flask-snap/Dockerfile.alpine --tag jdpc/flask-sdsnap:$(date +%s)
+    - name: Push Docker image
+      run: docker push jdpc/flask-sdsnap:$(date +%s) 
