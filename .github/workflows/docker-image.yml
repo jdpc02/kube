@@ -13,11 +13,11 @@ jobs:
     steps:
     - name: Checkout kube
       uses: actions/checkout@v2
-    - name: Switch to flask-snap directory
-      run: cd apps/flask-snap/
     - name: Login to dockerhub
       run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_ACCESS_TOKEN }}
     - name: Build the Docker image
-      run: docker build . --file Dockerfile.alpine --tag jdpc/flask-sdsnap:$(date +%s)
+      run: |
+      cd apps/flask-snap
+      docker build . --file Dockerfile.alpine --tag jdpc/flask-sdsnap:$(date +%s)
     - name: Push Docker image
       run: docker push jdpc/flask-sdsnap:$(date +%s) 
