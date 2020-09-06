@@ -16,9 +16,9 @@ jobs:
     - name: Login to dockerhub
       run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_ACCESS_TOKEN }}
     - name: Build the Docker image
-      run: docker build . --file Dockerfile.alpine --tag jdpc/flask-sdsnap:$(date +%s)
+      run: docker build . --file Dockerfile.alpine --tag ${{ secrets.DOCKER_USERNAME }}/flask-sdsnap:$(date +%s)
       working-directory: apps/flask-snap
     - name: Push Docker image
-      run: docker push jdpc/flask-sdsnap
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/flask-sdsnap
     - name: Cleanup
       run: docker logout
