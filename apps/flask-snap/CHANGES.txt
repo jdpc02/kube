@@ -4,3 +4,4 @@
 0.4.0 - 20190801 - DC - Added check if site is not reachable
 0.5.0 - 20190905 - DC - Update python modules to latest release and use python:3.7.4-alpine3.10
 0.6.0 - 20210123 - DC - Bump to lxml v3.6.2 and use python:3.9.1-alpine3.12 for security purposes
+1.0.0 - 20210409 - DC - Bump to lxml v4.6.3, jinja2 v2.11.3 and use python:alpine for security purposes
