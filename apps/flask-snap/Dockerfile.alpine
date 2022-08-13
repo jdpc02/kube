@@ -9,7 +9,7 @@ RUN apk --no-cache add libxml2-dev libxslt-dev gcc libc-dev && python -m venv ve
   && chmod +x boot.sh
 
 ENV FLASK_APP flask-snap.py
-ENV FLASK_ENV development
+ENV FLASK_DEBUG development
 ENV FLASK_RUN_PORT 5050
 USER sdsnap
 
